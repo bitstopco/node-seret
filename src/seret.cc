@@ -17,7 +17,6 @@ namespace {
 
   struct CallbackData {
     Nan::Persistent<v8::Object> thisObj;
-    std::unique_ptr<Nan::Callback> callback;
   };
   
   class Camera : public Nan::ObjectWrap {
@@ -33,7 +32,6 @@ namespace {
       
     Camera();
     ~Camera();
-    camera_t* camera;
   };
 
   //Nan Method
@@ -65,7 +63,7 @@ namespace {
     }
 
     const auto fd = info[0]->Uint32Value();
-    auto success = bool{camera_off(fd, id, value)};
+    auto success = bool{camera_off(fd)};
     info.GetReturnValue().Set(thisObj);
   }
 
@@ -99,7 +97,7 @@ namespace {
     }
 
     const auto fd = info[0]->Uint32Value();
-    auto success = bool{stop_capturing(fd)};
+    stop_capturing(fd);
     info.GetReturnValue().Set(thisObj);
 
   }
@@ -115,7 +113,7 @@ namespace {
     v8::Local<v8::Object> buffer = info[1]->ToObject();
     char* bufferData   = node::Buffer::Data(buffer);
     size_t bufferLength = node::Buffer::Length(buffer);
-    auto result = bool{capture_frame(fd, bufferData, bufferLength)};  
+    capture_frame(fd, bufferData, bufferLength);  
     info.GetReturnValue().Set(bufferData);
   }
 
@@ -131,11 +129,7 @@ namespace {
     const auto id = info[1]->Uint32Value();
     const auto value = info[2]->Int32Value();
     auto thisObj = info.Holder();
-    auto success = bool{control_set(fd, id, value)};
-    if (!success) {
-      Nan::ThrowError(cameraError(fd));
-      return;
-    }
+    control_set(fd, id, value);
     info.GetReturnValue().Set(thisObj);
   }
 
