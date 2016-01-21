@@ -63,7 +63,7 @@ namespace {
     }
 
     const auto fd = info[0]->Uint32Value();
-    auto success = bool{camera_off(fd)};
+    camera_off(fd);
     info.GetReturnValue().Set(thisObj);
   }
 
